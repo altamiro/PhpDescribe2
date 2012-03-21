@@ -2,9 +2,8 @@
   require 'phpdescribe/Color.php';
   require 'phpdescribe/SpecParser.php';
 
-  $filename = 'specs/especificacao_modelo_pequena.phpd';
+  $filename = 'specs/phpdescribe.phpd';
   $spec = SpecParser::parse(file_get_contents($filename));
-  
   SpecRunner::run($spec);
   echo $spec;
 
@@ -45,7 +44,6 @@
           $spec->set_success( false, $e->getMessage() );
         }
       }
-      
       foreach($spec->get_sub_specs() as $sub) {
         static::run($sub);
       } 
@@ -112,7 +110,6 @@
 
     private function format_group($level) {
       $padding  = str_repeat(' ', $level);
-
       return $padding . Color::dark_gray($this->name) . "\n";
     }
 
