@@ -16,10 +16,10 @@ class SpecParser {
 			if($type !== ' ') {
 				if($type === '=' && !$openNewSpec) {
 					$openNewSpec = true;
-					$content = '';
 				}
 				else if($type === '=' && $openNewSpec) {
 					$openNewSpec = false;
+					$content = '';
 				}
 				
 				if($type === 's') {
