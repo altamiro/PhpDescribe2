@@ -24,24 +24,30 @@ class SpecFormatter {
 
     static private function format_group(Spec $s, $level) {
       $padding  = str_repeat(' ', $level);
-      return $padding . Color::dark_gray($s->get_name()) . "\n";
+      $result = $s->get_result();
+      if(null === $result) {
+        $t = $padding . Color::dark_gray($s->get_name())  . "\n";
+      } elseif(true === $result) {
+        $t = $padding . Color::green($s->get_name())  . "\n";  
+      } else {
+        $t = $padding . Color::red($s->get_name())  . "\n";  
+      }
+      return $t;
     }
 
     static private function format_spec(Spec $s, $level) {
-      $padding  = str_repeat(' ', $level);
-      if($s->get_result() === null) {
-        $t = $padding . Color::dark_gray($s->get_name())  . "\n";
-      }
-      else {
-        if($s->get_result()) {
-          $t = $padding . Color::green($s->get_name())  . "\n";  
-        }
-        else {
-          $t = $padding . Color::red($s->get_name())  . "\n";  
-          $t .= $padding . Color::red( '[FAIL] ' . $s->get_message()) . "\n";
-        }  
-      }
       
+      $padding  = str_repeat(' ', $level);
+      $result = $s->get_result();
+
+      if(null === $result) {
+        $t = $padding . Color::dark_gray($s->get_name())  . "\n";
+      } elseif(true === $result) {
+        $t = $padding . Color::green($s->get_name())  . "\n";  
+      } else {
+        $t = $padding . Color::red($s->get_name())  . "\n";  
+        $t .= $padding . Color::red( '[FAIL] ' . $s->get_message()) . "\n";
+      }
       
       #$t .= Color::light_gray( substr($this->code, 0, 40) . '...' ) . "\n";
       return $t;

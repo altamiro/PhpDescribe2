@@ -180,6 +180,45 @@ $s->set_result(false,"messagexpto");
 $f = SpecFormatter::format($s);
 expect($f)->toBe(Color::red("ball bounces")."\n".Color::red("[FAIL] messagexpto")."\n");
 
+# shows a green group description if the group has succeded
+#..........................................................
+
+$s = new Spec('two things');
+$s_1 = new Spec('ok 1');
+$s_1->set_code("expect(1)->toBe(1);");
+$s_2 = new Spec('ok 2');
+$s_2->set_code("expect(2)->toBe(2);");
+$s->add_sub_spec($s_1);
+$s->add_sub_spec($s_2);
+SpecRunner::run($s);
+expect($s->get_result())->toBe(true);
+
+$f = SpecFormatter::format($s);
+$lines = explode("\n",$f);
+expect($lines[0])->toBe(Color::green("two things"));
+expect($lines[1])->toBe('  '.Color::green("ok 1"));
+expect($lines[2])->toBe('  '.Color::green("ok 2"));
+
+# shows a red group description if the group has failed
+#.......................................................
+$s = new Spec('two things');
+$s_1 = new Spec('fail 1');
+$s_1->set_code("expect(2)->toBe(1);");
+$s_2 = new Spec('ok 2');
+$s_2->set_code("expect(2)->toBe(2);");
+$s->add_sub_spec($s_1);
+$s->add_sub_spec($s_2);
+SpecRunner::run($s);
+
+expect($s->get_result())->toBe(false);
+
+$f = SpecFormatter::format($s);
+$lines = explode("\n",$f);
+expect($lines[0])->toBe(Color::red("two things"));
+expect($lines[1])->toBe('  '.Color::red("fail 1"));
+expect($lines[3])->toBe('  '.Color::green("ok 2"));
+
+
 
 
 
