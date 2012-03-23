@@ -405,3 +405,45 @@ try {
 }
 expect($thrown)->toBe(true);
 
+# parses a deep nested spec followed by a next one in the first level
+#....................................................................
+$str =<<<EOD
+=======
+grandpa
+=======
+expect(1)->toBe(1);
+
+  ======
+  father
+  ======
+  expect(2)->toBe(2);
+
+    =====
+    child
+    =====
+    expect(3)->toBe(3);
+
+      ==========
+      grandchild
+      ==========
+      expect(4)->toBe(4);
+
+=====================
+grandpa's brother
+=====================
+expect(5)->toBe(5);
+EOD;
+
+$spec = SpecParser::parse($str);  
+expect($spec->get_sub_spec(0)->get_name())->toBe('grandpa');
+expect($spec->get_sub_spec(0)->get_code())->toBe('expect(1)->toBe(1);');
+expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_name())->toBe('father');
+expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe('expect(2)->toBe(2);');
+expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_name())->toBe('child');
+expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe('expect(3)->toBe(3);');
+expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_name())->toBe('grandchild');
+expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe('expect(4)->toBe(4);');
+expect($spec->get_sub_spec(1)->get_name())->toBe("grandpa's brother");
+expect($spec->get_sub_spec(1)->get_code())->toBe("expect(5)->toBe(5);");
+
+
