@@ -51,7 +51,7 @@ if(!$ok) throw new Exception ('expect() should throw an Expectation');
 # Spec
 #######
 
-#  Is created with a name
+#  is initialized with a name
 #........................
 
 $s = new Spec('ball');
@@ -82,30 +82,7 @@ expect($s->get_result())->toBe(true);
 $s->set_result(false);
 expect($s->get_result())->toBe(false);
 
-	####################
-	#  Spec::__toString 
-	####################
-
-	#  shows a gray string if has not run
-	#.........................................
-	$s = new Spec('ball bounces');
-	$f = $s->__toString();
-	expect($f)->toBe(Color::dark_gray('ball bounces')."\n");
-
-	#  shows a green string if has succeded
-	#.........................................
-	$s = new Spec('ball bounces');
-	$s->set_result(true);
-	$f = $s->__toString();
-	expect($f)->toBe(Color::green('ball bounces')."\n");
-
-	# shows a red string and a message preceded by [FAIL] if has failed
-	# the message is set with a second optional parameter to set_result
-	#.........................................
-	$s = new Spec('ball bounces');
-	$s->set_result(false,"messagexpto");
-	$f = $s->__toString();
-	expect($f)->toBe(Color::red("ball bounces")."\n".Color::red("[FAIL] messagexpto")."\n");
+	
 
 ##############
 # Spec Runner
@@ -137,9 +114,71 @@ expect( $s->get_result() )->toBe(false);
 $s = new Spec('undeclared vars');
 $s->set_code("\$a = \$b + \$c;");
 SpecRunner::run($s);
+expect( $s->get_result() )->toBe(false);
 
+# if thw spec has sub_specs, runs them also
+#........................
+$s = new Spec('two things');
+$s_1 = new Spec('fail');
+$s_1->set_code("\$a = \$b + \$c;");
+$s_2 = new Spec('ok');
+$s_2->set_code("\$a = 2;");
+$s->add_sub_spec($s_1);
+$s->add_sub_spec($s_2);
 
+SpecRunner::run($s);
+$sub_specs = $s->get_sub_specs();
+expect($sub_specs[0]->get_result())->toBe(false);
+expect($sub_specs[1]->get_result())->toBe(true);
 
+# if one sub_spec fail the parent fails
+#........................................
+$s = new Spec('two things');
+$s_1 = new Spec('fail');
+$s_1->set_code("expect(2)->toBe(1);");
+$s_2 = new Spec('ok');
+$s_2->set_code("expect(1)->toBe(1);");
+$s->add_sub_spec($s_1);
+$s->add_sub_spec($s_2);
+SpecRunner::run($s);
+expect($s->get_result())->toBe(false);
+
+# if all sub_spec succed the parent succed
+#........................................
+$s = new Spec('two things');
+$s_1 = new Spec('ok 1 ');
+$s_1->set_code("expect(1)->toBe(1);");
+$s_2 = new Spec('ok 2 ');
+$s_2->set_code("expect(2)->toBe(2);");
+$s->add_sub_spec($s_1);
+$s->add_sub_spec($s_2);
+SpecRunner::run($s);
+expect($s->get_result())->toBe(true);
+
+####################
+#  SpecFormatter
+####################
+
+#  shows a gray string if has not run
+#.........................................
+$s = new Spec('ball bounces');
+$f = SpecFormatter::format($s);
+expect($f)->toBe(Color::dark_gray('ball bounces')."\n");
+
+#  shows a green string if has succeded
+#.........................................
+$s = new Spec('ball bounces');
+$s->set_result(true);
+$f = SpecFormatter::format($s);
+expect($f)->toBe(Color::green('ball bounces')."\n");
+
+# shows a red string and a message preceded by [FAIL] if has failed
+# the message is set with a second optional parameter to set_result
+#.........................................
+$s = new Spec('ball bounces');
+$s->set_result(false,"messagexpto");
+$f = SpecFormatter::format($s);
+expect($f)->toBe(Color::red("ball bounces")."\n".Color::red("[FAIL] messagexpto")."\n");
 
 
 
