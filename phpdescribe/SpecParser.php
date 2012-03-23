@@ -11,9 +11,17 @@ class SpecParser {
 		$specs[0] = $mainSpec;
 		$newSpec = false;
 		$openNewSpec = false;
+		$ident = null;
 		if($debug) echo "----------------\n";
-		foreach($lines as $line) {
+		foreach($lines as $i=>$line) {
 			$type = self::type($line);
+
+			if($ident !== null) $last_identation = $ident;
+			$ident = self::ident($line);
+
+			if($type == 'error:tab') {
+				throw new ParseException( 'Please use only blank spaces. Tab chars found on line ' . ($i+1) );
+			}
 			if($debug) echo "($type):".$line."\n";
 			if($type !== ' ') {
 				if($debug) echo "@1";
@@ -23,6 +31,9 @@ class SpecParser {
 				}
 				else if($type === '=' && $openNewSpec) {
 					if($debug) echo "@3";
+					if($ident != $last_identation) {
+						throw new ParseException( 'Wrong identation on line ' . ($i+1) );
+					}
 					$openNewSpec = false;
 					$content = '';
 				}
@@ -37,7 +48,14 @@ class SpecParser {
 				  	}
 					
 					$newSpec = new Spec(trim($line));
-					$ident = self::ident($line);
+					
+					if(!array_key_exists($ident, $specs)) {
+						throw new ParseException( 'Wrong identation on line ' . ($i+1) );
+					}
+					if($ident != $last_identation) {
+						throw new ParseException( 'Wrong identation on line ' . ($i) );
+					}
+
 					$specs[$ident]->add_sub_spec($newSpec);
 					$specs[$ident+2] = $newSpec;
 					$content = '';
@@ -58,6 +76,7 @@ class SpecParser {
 	}
 
 	static function type($line) {
+	  if( preg_match('/^ *\t.*$/', $line) ) return 'error:tab';
       if( preg_match('/^ *=+ *$/', $line) ) return '=';
       if( preg_match('/^ *$/', $line) ) return ' ';
       return 's';		
@@ -75,3 +94,5 @@ class SpecParser {
       return $ident;
 	}
 }
+
+class ParseException extends Exception{}

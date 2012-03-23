@@ -323,20 +323,85 @@ expect('tomorrow')->toBe('a new day');
 	expect('tomorrow')->toBe('a new day');
 EOD;
 
+
 $thrown = false;
 try {
 	$spec = SpecParser::parse($str);	
 }catch(ParseException $e) {
 	$thrown = true;
-	expect($e->get_line())->toBe(6);
+	expect($e->getMessage())->toBe('Please use only blank spaces. Tab chars found on line 6');
 }
 expect($thrown)->toBe(true);
 
-# throws an exception with line number if a # char is found out of the current identation or current + 2 
-#..........................................................................................................
+# throws an exception with line number if a title is found with a wrong identation
+# the only allowed identations are 0,2,4,6,8 ...
+#..................................................................................
 
+$str =<<<EOD
+===========================
+Tomorrow should be a new day
+===========================
+expect('tomorrow')->toBe('a new day');
 
+   ===========================
+   Tomorrow should be a new day
+   ===========================
+   expect('tomorrow')->toBe('a new day');
+EOD;
 
+$thrown = false;
+try {
+  $spec = SpecParser::parse($str);  
+}catch(ParseException $e) {
+  $thrown = true;
+  expect($e->getMessage())->toBe('Wrong identation on line 7');
+}
+expect($thrown)->toBe(true);
 
+# throws an exception with line number if a ==== before the title is found with a wrong identation
+#...................................................................................
+$str =<<<EOD
+===========================
+Tomorrow should be a new day
+===========================
+expect('tomorrow')->toBe('a new day');
 
+   ===========================
+  Tomorrow should be a new day
+  ===========================
+  expect('tomorrow')->toBe('a new day');
+EOD;
+
+$thrown = false;
+try {
+  $spec = SpecParser::parse($str);  
+}catch(ParseException $e) {
+  $thrown = true;
+  expect($e->getMessage())->toBe('Wrong identation on line 6');
+}
+expect($thrown)->toBe(true);
+
+# throws an exception with line number if a ==== after the title is found with a wrong identation
+#..................................................................................................
+
+$str =<<<EOD
+===========================
+Tomorrow should be a new day
+===========================
+expect('tomorrow')->toBe('a new day');
+
+  ===========================
+  Tomorrow should be a new day
+    ===========================
+  expect('tomorrow')->toBe('a new day');
+EOD;
+
+$thrown = false;
+try {
+  $spec = SpecParser::parse($str);  
+}catch(ParseException $e) {
+  $thrown = true;
+  expect($e->getMessage())->toBe('Wrong identation on line 8');
+}
+expect($thrown)->toBe(true);
 
