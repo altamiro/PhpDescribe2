@@ -218,6 +218,124 @@ expect($lines[0])->toBe(Color::red("two things"));
 expect($lines[1])->toBe('  '.Color::red("fail 1"));
 expect($lines[3])->toBe('  '.Color::green("ok 2"));
 
+####################
+#  SpecParser
+####################
+
+  #######################
+	#  With a single spec
+	#######################
+
+	# group read specs inside a spec named "main"
+	#............................................
+	$str = <<<EOD
+===========================
+Tomorrow should be a new day
+===========================
+expect('tomorrow')->toBe('a new day');
+EOD;
+	$spec = SpecParser::parse($str);
+	expect($spec->get_name())->toBe('main');
+
+	#... parse one spec as a child of main, named "One should be equals to one"
+	expect( count($spec->get_sub_specs()) )->toBe(1);
+	expect( $spec->get_sub_spec(0)->get_name() )->toBe("Tomorrow should be a new day");
+
+	#... parse the spec's code
+	expect( $spec->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('a new day');");
+
+	#######################
+	#  With two specs
+	#######################
+
+	$str = <<<EOD
+===========================
+Tomorrow should be a new day
+===========================
+expect('tomorrow')->toBe('a new day');
+
+===========================
+Tomorrow is friday
+===========================
+expect('tomorrow')->toBe('friday');
+EOD;
+
+	$spec = SpecParser::parse($str);    
+    #... extracts both specs
+	expect( count($spec->get_sub_specs()) )->toBe(2);
+	expect( $spec->get_sub_spec(0)->get_name() )->toBe("Tomorrow should be a new day");
+	expect( $spec->get_sub_spec(1)->get_name() )->toBe("Tomorrow is friday");
+
+	#... parse both spec's codes
+	expect( $spec->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('a new day');");
+	expect( $spec->get_sub_spec(1)->get_code() )->toBe("expect('tomorrow')->toBe('friday');");
+
+
+	#######################
+	#  Complex Structure
+	#######################
+
+	$str = <<<EOD
+===========================
+Tomorrow should be a new day
+===========================
+expect('tomorrow')->toBe('a new day');
+
+  ===========================
+  Tomorrow should be cold
+  ===========================
+  expect('tomorrow')->toBe('cold');
+
+=============
+1 should be 1
+=============
+expect(1)->toBe(1);
+
+  ==================
+  1 should not be 2
+  ==================
+  expect(1)->notToBe(2);
+EOD;
+
+	$spec = SpecParser::parse($str);    
+    #... extracts both specs
+	expect( count($spec->get_sub_specs()) )->toBe(2);
+	expect( count($spec->get_sub_spec(0)->get_sub_specs()) )->toBe(1);
+	expect( count($spec->get_sub_spec(1)->get_sub_specs()) )->toBe(1);
+
+	expect( $spec->get_sub_spec(1)->get_name() )->toBe("1 should be 1");
+  expect( $spec->get_sub_spec(0)->get_sub_spec(0)->get_name() )->toBe("Tomorrow should be cold");
+  expect( $spec->get_sub_spec(0)->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('cold');");
+  expect( $spec->get_sub_spec(1)->get_sub_spec(0)->get_name() )->toBe("1 should not be 2");
+	expect( $spec->get_sub_spec(1)->get_sub_spec(0)->get_code() )->toBe("expect(1)->notToBe(2);");
+
+# throws an exception with line number if a tab char is found before any text
+#............................................................................
+$str =<<<EOD
+===========================
+Tomorrow should be a new day
+===========================
+expect('tomorrow')->toBe('a new day');
+
+	===========================
+	Tomorrow should be a new day
+	===========================
+	expect('tomorrow')->toBe('a new day');
+EOD;
+
+$thrown = false;
+try {
+	$spec = SpecParser::parse($str);	
+}catch(ParseException $e) {
+	$thrown = true;
+	expect($e->get_line())->toBe(6);
+}
+expect($thrown)->toBe(true);
+
+# throws an exception with line number if a # char is found out of the current identation or current + 2 
+#..........................................................................................................
+
+
 
 
 

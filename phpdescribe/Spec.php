@@ -32,6 +32,10 @@ class Spec {
       return $this->sub_specs;
     }
 
+    function get_sub_spec($index) {
+      return $this->sub_specs[$index];
+    }
+
     function get_result() {
       return $this->result;
     }
