@@ -4,6 +4,7 @@ class SpecParser {
 
 	static function parse($text) {
 		$debug = false;
+		#$debug = true;
 
 		$lines = explode("\n",$text);
 
@@ -13,6 +14,7 @@ class SpecParser {
 		$openNewSpec = false;
 		$ident = null;
 		if($debug) echo "----------------\n";
+		$content = '';
 		foreach($lines as $i=>$line) {
 			$type = self::type($line);
 
@@ -22,14 +24,15 @@ class SpecParser {
 			if($type == 'error:tab') {
 				throw new ParseException( 'Please use only blank spaces. Tab chars found on line ' . ($i+1) );
 			}
-			if($debug) echo "($type):".$line."\n";
+			if($debug) echo "\n($type):".$line."\n";
+			
 			if($type !== ' ') {
 				if($debug) echo "@1";
-				if($type === '=' && !$openNewSpec) {
+				if($type === '#' && !$openNewSpec) {
 					if($debug) echo "@2";
 					$openNewSpec = true;
 				}
-				else if($type === '=' && $openNewSpec) {
+				else if($type === '#' && $openNewSpec) {
 					if($debug) echo "@3";
 					if($ident != $last_identation) {
 						throw new ParseException( 'Wrong identation on line ' . ($i+1) );
@@ -38,32 +41,28 @@ class SpecParser {
 					$content = '';
 				}
 				
-				if($type === 's') {
+				if($openNewSpec && $type === '# TITLE') {
 					if($debug) echo "@4";
-				  if($openNewSpec) {
-				  	if($debug) echo "@5";
-				  	if($newSpec) {
-				  		if($debug) echo "@6";
-				  		$newSpec->set_code($content);
-				  	}
-					
-					$newSpec = new Spec(trim($line));
-					
-					if(!array_key_exists($ident, $specs)) {
+				  	if(!array_key_exists($ident, $specs)) {
 						throw new ParseException( 'Wrong identation on line ' . ($i+1) );
 					}
 					if($ident != $last_identation) {
 						throw new ParseException( 'Wrong identation on line ' . ($i) );
 					}
-
+					if($newSpec) {
+				  		if($debug) echo "@5 --- " . $content;
+				  		$newSpec->set_code($content);
+				  	}
+				  	if($debug) echo "@6";
+					$newSpec = new Spec(trim(substr( trim($line),1)) );
+					$content = '';
 					$specs[$ident]->add_sub_spec($newSpec);
 					$specs[$ident+2] = $newSpec;
-					$content = '';
-				  }
-				  else {
-				  	if($debug) echo "@7";
+					
+				}
+				if($type === 's') {
 				  	$content .= trim($line);
-				  }
+					if($debug) echo "@7 --- " . $content;
 				}
 			}
 		}
@@ -77,7 +76,8 @@ class SpecParser {
 
 	static function type($line) {
 	  if( preg_match('/^ *\t.*$/', $line) ) return 'error:tab';
-      if( preg_match('/^ *=+ *$/', $line) ) return '=';
+      if( preg_match('/^ *#+ *$/', $line) ) return '#';
+      if( preg_match('/^ *#+.*$/', $line) ) return '# TITLE';
       if( preg_match('/^ *$/', $line) ) return ' ';
       return 's';		
 	}
