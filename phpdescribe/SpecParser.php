@@ -26,7 +26,7 @@ class SpecParser {
 			}
 			if($debug) echo "\n($type):".$line."\n";
 			
-			if($type !== ' ') {
+			if($type !== ' ' && $type !== 'close php') {
 				if($debug) echo "@1";
 				if($type === '#' && !$openNewSpec) {
 					if($debug) echo "@2";
@@ -78,6 +78,7 @@ class SpecParser {
 	  if( preg_match('/^ *\t.*$/', $line) ) return 'error:tab';
       if( preg_match('/^ *#+ *$/', $line) ) return '#';
       if( preg_match('/^ *#+.*$/', $line) ) return '# TITLE';
+      if( preg_match('/^^ *\?>/', $line) ) return 'close php';
       if( preg_match('/^ *$/', $line) ) return ' ';
       return 's';		
 	}
