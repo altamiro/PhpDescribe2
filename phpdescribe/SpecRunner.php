@@ -20,9 +20,8 @@
             }
           }
           else {
-
-            $result = static::discover_error_line($code);
-            $spec->set_result( false, $result );
+            $line = static::discover_error_line($code);
+            $spec->set_result( false, 'Systax error on line ' . $line . ' of the code.' );
           }
         }  
       }
@@ -45,14 +44,10 @@
       $file = 'temp/code_with_error.php';
       file_put_contents($file, '<?php'.$code);  
       ob_start();
-      $result = passthru('php -l '.$file);
-      $result = ob_get_contents();
+      passthru('php -l '.$file);
       ob_end_clean();
-      #echo "++++++++++";
-      echo "result:" . $result;
-      echo "\n";
-      // echo "------------";
-      return $result;
+      $error = error_get_last();
+      return $error['line'];
     }
 
     static function check_syntax($code) {
