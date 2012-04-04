@@ -61,7 +61,7 @@ class SpecParser {
 					
 				}
 				if($type === 's') {
-				  	$content .= trim($line);
+				  	$content .= trim($line)."\n";
 					if($debug) echo "@7 --- " . $content;
 				}
 			}

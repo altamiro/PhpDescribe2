@@ -1,35 +1,18 @@
-==============
-phpdescribe
-==============
+#############
+# phpdescribe
+#############
+
+  ###############################################
+  # simple passing test
+  ###############################################
+  expect(1+1)->toBe(2);
+
+  ###############################################
+  # parser error (no ; on the end of the line)
+  ###############################################
+  expect(1+1)->toBe(2);
+  expect(1+1)->toBe(2)
   
-  ==========
-  requires
-  ==========
-  require_once 'phpdescribe/Color.php';
-  require_once 'phpdescribe/SpecParser.php';
+  expect(1+1)->toBe(2);
 
-  ==========================================
-  lê todos os códigos
-  ==========================================
-  //
-
-  ==========================================
-  da erro se tiver tab antes de algum caracter
-  ==========================================
-  //
-
-  ==========================================
-  faz parse do número correto de specs
-  ==========================================
-  $filename = 'specs/especificacao_simples.phpd';
-  $spec = SpecParser::parse(file_get_contents($filename));
-  expect( count($spec->get_sub_specs()) )->toBe(10);
-
-  ==========================================
-  segundo teste - não está rodando ainda....
-  ==========================================
-  require_once 'phpdescribe/Color.php';
-  require_once 'phpdescribe/SpecParser.php';
-  $filename = 'specs/especificacao_simples.phpd';
-  $spec = SpecParser::parse(file_get_contents($filename));
-  expect( count($spec->get_sub_specs()) )->toBe(2);
+  

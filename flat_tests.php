@@ -95,6 +95,14 @@ $s->set_code("\$a=2;\n\$a = \$a + 1;\n");
 SpecRunner::run($s);
 expect( $s->get_result() )->toBe(true);
 
+# detects a syntax error and sets an error on the spec
+#.....................................................
+$s = new Spec('do something');
+$s->set_code("\$a=2");
+SpecRunner::run($s);
+expect( $s->get_result() )->toBe(false);
+
+
 # sets a negative result if expectation fails
 #............................................
 $s = new Spec('one should be two');
@@ -242,7 +250,7 @@ EOD;
 	expect( $spec->get_sub_spec(0)->get_name() )->toBe("Tomorrow should be a new day");
 
 	#... parse the spec's code
-	expect( $spec->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('a new day');");
+	expect( $spec->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('a new day');\n");
 
 	#######################
 	#  With two specs
@@ -267,8 +275,8 @@ EOD;
 	expect( $spec->get_sub_spec(1)->get_name() )->toBe("Tomorrow is friday");
 
 	#... parse both spec's codes
-	expect( $spec->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('a new day');");
-	expect( $spec->get_sub_spec(1)->get_code() )->toBe("expect('tomorrow')->toBe('friday');");
+	expect( $spec->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('a new day');\n");
+	expect( $spec->get_sub_spec(1)->get_code() )->toBe("expect('tomorrow')->toBe('friday');\n");
 
   ##########################
   #  Opening and closing php
@@ -295,8 +303,8 @@ EOD;
   expect( $spec->get_sub_spec(1)->get_name() )->toBe("Tomorrow is friday");
 
   #... parse both spec's codes
-  expect( $spec->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('a new day');");
-  expect( $spec->get_sub_spec(1)->get_code() )->toBe("expect('tomorrow')->toBe('friday');");
+  expect( $spec->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('a new day');\n");
+  expect( $spec->get_sub_spec(1)->get_code() )->toBe("expect('tomorrow')->toBe('friday');\n");
 
 
 	#######################
@@ -333,9 +341,9 @@ EOD;
 
 	expect( $spec->get_sub_spec(1)->get_name() )->toBe("1 should be 1");
   expect( $spec->get_sub_spec(0)->get_sub_spec(0)->get_name() )->toBe("Tomorrow should be cold");
-  expect( $spec->get_sub_spec(0)->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('cold');");
+  expect( $spec->get_sub_spec(0)->get_sub_spec(0)->get_code() )->toBe("expect('tomorrow')->toBe('cold');\n");
   expect( $spec->get_sub_spec(1)->get_sub_spec(0)->get_name() )->toBe("1 should not be 2");
-	expect( $spec->get_sub_spec(1)->get_sub_spec(0)->get_code() )->toBe("expect(1)->notToBe(2);");
+	expect( $spec->get_sub_spec(1)->get_sub_spec(0)->get_code() )->toBe("expect(1)->notToBe(2);\n");
 
 # throws an exception with line number if a tab char is found before any text
 #............................................................................
@@ -464,15 +472,15 @@ EOD;
 
 $spec = SpecParser::parse($str);  
 expect($spec->get_sub_spec(0)->get_name())->toBe('grandpa');
-expect($spec->get_sub_spec(0)->get_code())->toBe('expect(1)->toBe(1);');
+expect($spec->get_sub_spec(0)->get_code())->toBe("expect(1)->toBe(1);\n");
 expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_name())->toBe('father');
-expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe('expect(2)->toBe(2);');
+expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe("expect(2)->toBe(2);\n");
 expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_name())->toBe('child');
-expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe('expect(3)->toBe(3);');
+expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe("expect(3)->toBe(3);\n");
 expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_name())->toBe('grandchild');
-expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe('expect(4)->toBe(4);');
+expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe("expect(4)->toBe(4);\n");
 expect($spec->get_sub_spec(1)->get_name())->toBe("grandpa's brother");
-expect($spec->get_sub_spec(1)->get_code())->toBe("expect(5)->toBe(5);");
+expect($spec->get_sub_spec(1)->get_code())->toBe("expect(5)->toBe(5);\n");
 
 
 # Spec allows array access

@@ -1,18 +1,17 @@
 <?php
-  require 'phpdescribe/Color.php';
-  require 'phpdescribe/SpecParser.php';
-  require 'phpdescribe/SpecRunner.php';
-  require 'phpdescribe/Spec.php';
-  require 'phpdescribe/SpecFormatter.php';
-  require 'phpdescribe/Expectation.php';
-  require 'flat_tests.php';
+
+require 'phpdescribe/Color.php';
+require 'phpdescribe/SpecParser.php';
+require 'phpdescribe/SpecRunner.php';
+require 'phpdescribe/Spec.php';
+require 'phpdescribe/SpecFormatter.php';
+require 'phpdescribe/Expectation.php';
+#require 'flat_tests.php';
 
 
-  // $filename = 'specs/phpdescribe.phpd';
-  // $spec = SpecParser::parse(file_get_contents($filename));
-  
-  // SpecRunner::run($spec);
-  // var_dump($spec);
-  #echo $spec;
-
+$filename = 'specs/phpdescribe.phpd';
+$text = file_get_contents($filename);
+$spec = SpecParser::parse($text);
+SpecRunner::run($spec);
+echo SpecFormatter::format($spec);
   
