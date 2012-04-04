@@ -21,7 +21,7 @@
           }
           else {
             $line = static::discover_error_line($code);
-            $spec->set_result( false, 'Systax error on line ' . $line . ' of the code.' );
+            $spec->set_result( false, 'Syntax error on line ' . $line . ' of the code.' );
           }
         }  
       }
