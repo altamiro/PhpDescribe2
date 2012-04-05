@@ -13,6 +13,8 @@
               $spec->set_result( true );
             }
             catch(FailedExpectationException $e) {
+              $trace = $e->getTrace();
+              $spec->set_error_line($trace[0]['line']);
               $spec->set_result( false, $e->getMessage() );
             }
             catch(Exception $e) {
@@ -21,6 +23,7 @@
           }
           else {
             $line = static::discover_error_line($code);
+            $spec->set_error_line($line);
             $spec->set_result( false, 'Syntax error on line ' . $line . ' of the code.' );
           }
         }  

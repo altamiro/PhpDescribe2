@@ -26,7 +26,7 @@ class SpecParser {
 			}
 			if($debug) echo "\n($type):".$line."\n";
 			
-			if($type !== ' ' && $type !== 'close php') {
+			if($type !== 'close php') {
 				if($debug) echo "@1";
 				if($type === '#' && !$openNewSpec) {
 					if($debug) echo "@2";
@@ -51,7 +51,7 @@ class SpecParser {
 					}
 					if($newSpec) {
 				  		if($debug) echo "@5 --- " . $content;
-				  		$newSpec->set_code($content);
+				  		$newSpec->set_code(trim($content));
 				  	}
 				  	if($debug) echo "@6";
 					$newSpec = new Spec(trim(substr( trim($line),1)) );
@@ -60,7 +60,7 @@ class SpecParser {
 					$specs[$ident+2] = $newSpec;
 					
 				}
-				if($type === 's') {
+				if($type === 's' || $type === ' ') {
 				  	$content .= trim($line)."\n";
 					if($debug) echo "@7 --- " . $content;
 				}
@@ -69,7 +69,7 @@ class SpecParser {
 		if($debug) echo "@8";
 		if($newSpec) {
 			if($debug) echo "@9";
-	  		$newSpec->set_code($content);
+	  		$newSpec->set_code(trim($content));
 	  	}
 	  	return $specs[0];
 	}

@@ -6,7 +6,7 @@ require 'phpdescribe/SpecRunner.php';
 require 'phpdescribe/Spec.php';
 require 'phpdescribe/SpecFormatter.php';
 require 'phpdescribe/Expectation.php';
-#require 'flat_tests.php';
+require 'flat_tests.php';
 
 
 $filename = 'specs/phpdescribe.phpd';

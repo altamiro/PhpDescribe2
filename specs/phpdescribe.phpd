@@ -17,36 +17,72 @@
   SpecRunner::run($s);
   expect($s->get_result())->toBe(true);
 
-  ###############################################
-  # should show the line of the parser error
-  ###############################################
-  $s = new Spec('test');
-  $s->set_code('
-    expect(1)->toBe(1)
+  #############
+  #  Error Line
+  #############
+
+    #########################################################
+    # should show the line of the parser error on the message
+    #########################################################
+
+      ############################
+      # no blank lines in the code
+      ############################
+      $s = new Spec('test');
+      $s->set_code('
+        expect(1)->toBe(1)
+        expect(1)->toBe(1);
+      ');
+      SpecRunner::run($s);
+      expect($s->get_message())->toBe('Syntax error on line 3 of the code.');
+
+      ############################
+      # code with blank lines
+      ############################
+      $s = new Spec('test');
+      $s->set_code('
+
+        expect(1)->toBe(1)
+        expect(1)->toBe(1);
+      ');
+      SpecRunner::run($s);
+      expect($s->get_message())->toBe('Syntax error on line 4 of the code.');
+
+    ##########################################
+    # should keep the line of the parser error
+    ##########################################
+    $s = new Spec('test');
+    $s->set_code('
+      expect(1)->toBe(1)
+      expect(1)->toBe(1);
+    ');
+    SpecRunner::run($s);
+    expect($s->get_error_line())->toBe(3);
+
+    ###############################################
+    # should keep the line of the failing test
+    ###############################################
+    $s = new Spec('test');
+    $s->set_code('expect(1)->toBe(2);');
+    SpecRunner::run($s);
+    expect($s->get_error_line())->toBe(1);
+    $s->set_code('expect(1)->toBe(1);
     expect(1)->toBe(1);
-  ');
-  SpecRunner::run($s);
-  expect($s->get_message())->toBe('Syntax error on line 3 of the code.');
+    expect(1)->toBe(2);
+    ');
+    SpecRunner::run($s);
+    expect($s->get_error_line())->toBe(3);
 
-  ###################################################################################
-  # should show the line of the parser error in a code with blank lines
-  ###################################################################################
-  $s = new Spec('test');
-  $s->set_code('
 
-    expect(1)->toBe(1)
-    expect(1)->toBe(1);
-  ');
-  SpecRunner::run($s);
-  expect($s->get_message())->toBe('Syntax error on line 4 of the code.');
-
-  ###############################################
-  # should show the line of the failing test
-  ###############################################
+    
 
   ###############################################
   # one test should run in isolation
   ###############################################
+
+  ###################################
+  # should recover from a fatal error
+  ###################################
 
 
   

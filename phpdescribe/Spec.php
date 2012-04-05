@@ -6,6 +6,7 @@ class Spec {
     private $sub_specs = array();
     private $result = null;
     private $message;
+    private $error_line;
 
     function __construct($name) {
       $this->name = $name;
@@ -13,6 +14,14 @@ class Spec {
 
     function add_sub_spec($sub_spec) {
       $this->sub_specs[] = $sub_spec;
+    }
+
+    function set_error_line($error_line) {
+      $this->error_line = $error_line;
+    }
+
+    function get_error_line() {
+      return $this->error_line;
     }
 
     function set_result($result, $message=null) {
