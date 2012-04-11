@@ -51,6 +51,15 @@ class Spec {
 
     function get_code() {
       return $this->code;
+    }
+    
+    function copy_properties($spec) {
+      $this->name       = $spec->get_name();
+      $this->code       = $spec->get_code();
+      #$this->sub_specs  = $spec->get_sub_specs();
+      $this->result     = $spec->get_result();
+      $this->message    = $spec->get_message();
+      $this->error_line = $spec->get_error_line();
     }    
 
     function get_name() {

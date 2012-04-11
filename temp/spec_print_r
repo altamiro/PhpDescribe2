@@ -1,0 +1,12 @@
+Spec Object
+(
+    [name:Spec:private] => fail!!!
+    [code:Spec:private] => expect(9)->toBe(2);
+    [sub_specs:Spec:private] => Array
+        (
+        )
+
+    [result:Spec:private] => 
+    [message:Spec:private] => Expecting 9 toBe 2
+    [error_line:Spec:private] => 1
+)

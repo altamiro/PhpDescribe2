@@ -17,6 +17,10 @@
   SpecRunner::run($s);
   expect($s->get_result())->toBe(true);
 
+  ####################################################
+  #  Should keep the beggining code line of each spec
+  ####################################################
+
   #############
   #  Error Line
   #############
@@ -93,6 +97,25 @@
       # verify the var declared on the other test is not set
       #######################################################
       expect(isset($a))->toBe(false);
+      
+    #######################################################
+    # no vars are set on each spec
+    #######################################################
+    $v = get_defined_vars();
+    expect(count($v))->toBe(0);
+
+    #############################################################################
+    # should recover from a fatal error running each test in a isolated proccess
+    #############################################################################
+
+
+    ####################################
+    # should recover from a fatal error
+    ####################################
+    //$o = new StdClass();
+    //$o->inexistent_method_throws_error();
+
+
 
 
 

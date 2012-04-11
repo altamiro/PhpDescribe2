@@ -1,3 +1,3 @@
-<?php
-expect(1)->toBe(1)
-expect(1)->toBe(1);
+<?phpexpect(9)->toBe(2);
+expect(9)->toBe(2)
+expect(9)->toBe(2);
