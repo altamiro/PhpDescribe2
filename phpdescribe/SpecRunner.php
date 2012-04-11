@@ -1,4 +1,5 @@
 <?php 
+  const ERROR_FILE = 'temp/error';
 
   class SingleSpecRunner {
 
@@ -26,6 +27,7 @@
       );
     }
 
+
     static function deserialize_spec() {
       require 'temp/serialized_spec.php';
       return $___spec_;
@@ -35,23 +37,18 @@
       if($code !== 'null' && $code !== '') {
         $code = $spec->get_code();
         if(self::check_syntax($code)) {
-            echo '###' . $spec->get_name() . "\n";
             static::serialize_spec($spec);
-            ob_start();
-            passthru('php run_eval.php');
-            $x = ob_get_contents();
-            ob_end_clean();
-            echo "xxxxxxxxxxxxxxxx:\n";
-            print_r($x);
-
+            $retorno_shell = shell_exec('php run_eval.php');
+            #print_r(preg_match(pattern, subject)$retorno_shell,'/PHP Fatal error:(.*) in .*:.*eval.*line (.*)/')
             $unserialized_spec = static::deserialize_spec();
             $spec->copy_properties($unserialized_spec);
             if($spec->get_result() !== true && $spec->get_result() !== false) {
-              $spec->set_result(false, 'Unusual script termination: probably a fatal error.');
+              if(file_exists(ERROR_FILE)) {
+                require(ERROR_FILE);
+                $spec->set_error_line($___error_['line']);
+                $spec->set_result( false, $___error_['message'] );
+              }
             }
-            #echo "----error::: \n";
-            #$error = error_get_last();
-            #print_r($error);
         }
         else {
           $line = static::discover_error_line($code);
