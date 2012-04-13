@@ -1,5 +1,7 @@
 <?php
 
+echo "------------- starting flat tests \n";
+
 ##########################
 # Expectation
 ##########################
@@ -210,7 +212,7 @@ expect($lines[2])->toBe('  '.Color::green("ok 2"));
 # shows a red group description if the group has failed
 #.......................................................
 $s = new Spec('two things');
-$s_1 = new Spec('fail 1');
+$s_1 = new Spec('fail 1 *');
 $s_1->set_code("expect(2)->toBe(1);");
 $s_2 = new Spec('ok 2');
 $s_2->set_code("expect(2)->toBe(2);");
@@ -223,7 +225,7 @@ expect($s->get_result())->toBe(false);
 $f = SpecFormatter::format($s);
 $lines = explode("\n",$f);
 expect($lines[0])->toBe(Color::red("two things"));
-expect($lines[1])->toBe('  '.Color::red("fail 1"));
+expect($lines[1])->toBe('  '.Color::red("fail 1 *"));
 expect($lines[3])->toBe('  '.Color::green("ok 2"));
 
 ####################
@@ -485,3 +487,6 @@ expect($spec->get_sub_spec(1)->get_code())->toBe("expect(5)->toBe(5);");
 
 # Spec allows array access
 #..........................
+
+
+echo "------------- ending flat tests \n";

@@ -3,7 +3,9 @@
 
   class SingleSpecRunner {
 
-    static function run_eval( $spec) {
+    static function run_eval() {
+      $serialize_random = $_SERVER['argv'][1];
+      $spec = self::deserialize_spec($serialize_random);
       try {
         eval($spec->get_code());
         $spec->set_result( true );
@@ -16,31 +18,37 @@
       catch(Exception $e) {
         $spec->set_result( false, $e->getMessage() );
       }
-      static::serialize_spec($spec);
+      static::serialize_spec($spec, $serialize_random);
     }
 
-    static function serialize_spec($spec) {
+    static function serialize_spec($spec, $serialize_random) {
+      $serial = var_export(serialize($spec),1);
       file_put_contents(
-        'temp/serialized_spec.php', 
+        "temp/serialized_spec_$serialize_random.php",   
         "<?php\n"
-        ." \$___spec_ = unserialize('" . serialize($spec) . "'); \n"
+        ." \$___spec_ = unserialize(" . $serial . "); \n"
       );
     }
 
 
-    static function deserialize_spec() {
-      require 'temp/serialized_spec.php';
+    static function deserialize_spec($serialize_random, $delete = false) {
+      $file = "temp/serialized_spec_$serialize_random.php";
+      require $file;
+      if($delete) {
+        unlink($file);
+      }
       return $___spec_;
     }
 
     static function run($spec, $code) {
+      #echo "### running " . $spec->get_name() . "\n";
       if($code !== 'null' && $code !== '') {
         $code = $spec->get_code();
         if(self::check_syntax($code)) {
-            static::serialize_spec($spec);
-            $retorno_shell = shell_exec('php run_eval.php');
-            #print_r(preg_match(pattern, subject)$retorno_shell,'/PHP Fatal error:(.*) in .*:.*eval.*line (.*)/')
-            $unserialized_spec = static::deserialize_spec();
+            $serialize_random = time() . '_' . rand(0,99999);
+            static::serialize_spec($spec, $serialize_random);
+            $retorno_shell = shell_exec('php run_eval.php '.$serialize_random);
+            $unserialized_spec = static::deserialize_spec($serialize_random, true);
             $spec->copy_properties($unserialized_spec);
             if($spec->get_result() !== true && $spec->get_result() !== false) {
               if(file_exists(ERROR_FILE)) {

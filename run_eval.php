@@ -2,7 +2,6 @@
 require('phpdescribe/Expectation.php'); 
 require('phpdescribe/SpecRunner.php'); 
 require('phpdescribe/Spec.php'); 
-require('temp/serialized_spec.php'); 
 
 register_shutdown_function(function() {
 	$error = error_get_last();
@@ -17,4 +16,4 @@ register_shutdown_function(function() {
 
 });
 if(file_exists(ERROR_FILE)) unlink(ERROR_FILE);
-SingleSpecRunner::run_eval($___spec_); 
+SingleSpecRunner::run_eval(); 
