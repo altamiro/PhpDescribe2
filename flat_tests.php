@@ -90,6 +90,17 @@ expect($s->get_result())->toBe(false);
 # Spec Runner
 ##############
 
+# SingleSpecRunner should serialize and desserialize a spec succesfully
+#............................................................................
+$s = new Spec('do something');
+$s->set_code("\$a=2;\n\$a = \$a + 1;\n");
+$serialize_random = 'xpto';
+SingleSpecRunner::serialize_spec($s, $serialize_random);
+$s2 = SingleSpecRunner::deserialize_spec($serialize_random);
+expect(serialize($s2))->toBe(serialize($s));
+
+
+
 # runs the code inside a spec and sets a positive result if no error is found
 #............................................................................
 $s = new Spec('do something');
@@ -483,10 +494,6 @@ expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)
 expect($spec->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_sub_spec(0)->get_code())->toBe("expect(4)->toBe(4);");
 expect($spec->get_sub_spec(1)->get_name())->toBe("grandpa's brother");
 expect($spec->get_sub_spec(1)->get_code())->toBe("expect(5)->toBe(5);");
-
-
-# Spec allows array access
-#..........................
 
 
 echo "------------- ending flat tests \n";

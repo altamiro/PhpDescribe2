@@ -1,5 +1,6 @@
 <?php
 require('phpdescribe/Expectation.php'); 
+require('phpdescribe/SingleSpecRunner.php'); 
 require('phpdescribe/SpecRunner.php'); 
 require('phpdescribe/Spec.php'); 
 
