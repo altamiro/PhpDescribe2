@@ -2,27 +2,40 @@
 
 class SpecFormatter {
 
-    static function format(Spec $s){
-      return self::format_text($s);
+    function format(Spec $spec){
+      $text = $this->format_text($spec);
+      $text .= "\n";
+
+      $failed_specs = $spec->get_failed_leaves();
+      if(count($failed_specs)) {
+        $text .= Color::red("Failed Specs:")."\n\n";  
+        foreach($failed_specs as $spec) {
+          $text .= Color::red($spec->get_name()) . "\n";
+          $text .= Color::red('---------------------------------------------------') . "\n";
+          $text .= Color::red($spec->get_message()) . "\n\n";
+        }
+      }
+      
+      
+      return $text;
     }
 
-    static protected function format_text(Spec $s,$level = 0) {
-
+    protected function format_text(Spec $s,$level = 0) {
       if( count($s->get_sub_specs()) ) {
-        $txt = self::format_group($s, $level);
+        $txt = $this->format_group($s, $level);
       }
       else {
-        $txt = self::format_spec($s, $level);
+        $txt = $this->format_spec($s, $level);
       }      
 
       foreach($s->get_sub_specs() as $sub) {
-        $txt .= self::format_text($sub,$level + 2);
+        $txt .= $this->format_text($sub,$level + 2);
       }
 
       return $txt;
     }
 
-    static private function format_group(Spec $s, $level) {
+    private function format_group(Spec $s, $level) {
       $padding  = str_repeat(' ', $level);
       $result = $s->get_result();
       if(null === $result) {
@@ -35,7 +48,7 @@ class SpecFormatter {
       return $t;
     }
 
-    static private function format_spec(Spec $s, $level) {
+    private function format_spec(Spec $s, $level) {
       
       $padding  = str_repeat(' ', $level);
       $result = $s->get_result();
@@ -46,7 +59,7 @@ class SpecFormatter {
         $t = $padding . Color::green($s->get_name())  . "\n";  
       } else {
         $t = $padding . Color::red($s->get_name())  . "\n";  
-        $t .= $padding . Color::red( '[FAIL] ' . $s->get_message()) . "\n";
+        #$t .= $padding . Color::red( '[FAIL] ' . $s->get_message()) . "\n";
       }
       
       #$t .= Color::light_gray( substr($this->code, 0, 40) . '...' ) . "\n";

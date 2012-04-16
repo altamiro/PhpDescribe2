@@ -7,11 +7,19 @@ require 'phpdescribe/SpecRunner.php';
 require 'phpdescribe/Spec.php';
 require 'phpdescribe/SpecFormatter.php';
 require 'phpdescribe/Expectation.php';
-require 'flat_tests.php';
 
- $filename = 'specs/phpdescribe.phpd';
+try {
+  require 'flat_tests.php';  # flat tests serve for testing phpdescribe without phpdescribe 
+}
+catch(Exception $e){
+  echo Color::red("!!!!!!!!!!! ERROR: EXCEPTION THROWN ON FLAT TESTS \n message: " . $e->getMessage());
+  echo Color::red("\n trace: \n" . $e->getTraceAsString());
+}
+
+ $filename = 'specs/phpdescribe.spec';
  $text = file_get_contents($filename);
  $spec = SpecParser::parse($text);
 
  SpecRunner::run($spec);
- echo SpecFormatter::format($spec);
+ $formatter = new SpecFormatter();
+ echo $formatter->format($spec);

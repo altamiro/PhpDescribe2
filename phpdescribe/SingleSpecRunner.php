@@ -5,7 +5,8 @@ class SingleSpecRunner {
     $serialize_random = $_SERVER['argv'][1];
     $spec = self::deserialize_spec($serialize_random);
     try {
-      eval($spec->get_code());
+      #eval($spec->get_code());
+      static::run_isolated_code($spec->get_code());
       $spec->set_result( true );
     }
     catch(FailedExpectationException $e) {
@@ -17,6 +18,10 @@ class SingleSpecRunner {
       $spec->set_result( false, $e->getMessage() );
     }
     static::serialize_spec($spec, $serialize_random);
+  }
+
+  static function run_isolated_code($______code) {
+    eval($______code);
   }
 
   static function serialize_spec($spec, $serialize_random) {
@@ -45,6 +50,7 @@ class SingleSpecRunner {
           $serialize_random = time() . '_' . rand(0,99999);
           static::serialize_spec($spec, $serialize_random);
           $retorno_shell = shell_exec('php run_eval.php '.$serialize_random);
+          echo $retorno_shell;
           $unserialized_spec = static::deserialize_spec($serialize_random, true);
           $spec->copy_properties($unserialized_spec);
           if($spec->get_result() !== true && $spec->get_result() !== false) {

@@ -3,6 +3,7 @@ require('phpdescribe/Expectation.php');
 require('phpdescribe/SingleSpecRunner.php'); 
 require('phpdescribe/SpecRunner.php'); 
 require('phpdescribe/Spec.php'); 
+require 'phpdescribe/exception_error.php';
 
 register_shutdown_function(function() {
 	$error = error_get_last();

@@ -176,45 +176,68 @@ $s->add_sub_spec($s_2);
 SpecRunner::run($s);
 expect($s->get_result())->toBe(true);
 
+# get all failed leaves
+#..............................
+$s = new Spec('two things');
+$s_1 = new Spec('ok 1');
+$s_1->set_code("expect(1)->toBe(2);");
+$s_2 = new Spec('ok 2');
+$s_21 = new Spec('ok 2.1');
+$s_21->set_code("expect(1)->toBe(2);");
+$s->add_sub_spec($s_21);
+$s->add_sub_spec($s_1);
+$s->add_sub_spec($s_2);
+SpecRunner::run($s);
+$failed_leaves = $s->get_failed_leaves();
+expect( $failed_leaves[0] )->toBe( $s_1 );
+expect( $failed_leaves[1] )->toBe( $s_21 );
+
 ####################
 #  SpecFormatter
 ####################
 
 #  shows a gray string if has not run
 #.........................................
-$s = new Spec('ball bounces');
-$f = SpecFormatter::format($s);
-expect($f)->toBe(Color::dark_gray('ball bounces')."\n");
+$spec = new Spec('ball bounces');
+$formatter = new SpecFormatter();
+$f = $formatter->format($spec);
+$lines = explode("\n",$f);
+expect($lines[0])->toBe(Color::dark_gray('ball bounces'));
 
 #  shows a green string if has succeded
 #.........................................
-$s = new Spec('ball bounces');
-$s->set_result(true);
-$f = SpecFormatter::format($s);
-expect($f)->toBe(Color::green('ball bounces')."\n");
+$spec = new Spec('ball bounces');
+$spec->set_result(true);
+$formatter = new SpecFormatter();
+$f = $formatter->format($spec);
+$lines = explode("\n",$f);
+expect($lines[0])->toBe(Color::green('ball bounces'));
 
-# shows a red string and a message preceded by [FAIL] if has failed
-# the message is set with a second optional parameter to set_result
+# shows a red string if it has failed
 #.........................................
-$s = new Spec('ball bounces');
-$s->set_result(false,"messagexpto");
-$f = SpecFormatter::format($s);
-expect($f)->toBe(Color::red("ball bounces")."\n".Color::red("[FAIL] messagexpto")."\n");
+$spec = new Spec('ball bounces');
+$spec->set_result(false,"messagexpto");
+$formatter = new SpecFormatter();
+$f = $formatter->format($spec);
+$lines = explode("\n",$f);
+expect($lines[0])->toBe(Color::red('ball bounces'));
+
 
 # shows a green group description if the group has succeded
 #..........................................................
 
-$s = new Spec('two things');
+$spec = new Spec('two things');
 $s_1 = new Spec('ok 1');
 $s_1->set_code("expect(1)->toBe(1);");
 $s_2 = new Spec('ok 2');
 $s_2->set_code("expect(2)->toBe(2);");
-$s->add_sub_spec($s_1);
-$s->add_sub_spec($s_2);
-SpecRunner::run($s);
-expect($s->get_result())->toBe(true);
+$spec->add_sub_spec($s_1);
+$spec->add_sub_spec($s_2);
+SpecRunner::run($spec);
+expect($spec->get_result())->toBe(true);
 
-$f = SpecFormatter::format($s);
+$formatter = new SpecFormatter();
+$f = $formatter->format($spec);
 $lines = explode("\n",$f);
 expect($lines[0])->toBe(Color::green("two things"));
 expect($lines[1])->toBe('  '.Color::green("ok 1"));
@@ -233,11 +256,35 @@ SpecRunner::run($s);
 
 expect($s->get_result())->toBe(false);
 
-$f = SpecFormatter::format($s);
+$formatter = new SpecFormatter();
+$f = $formatter->format($s);
 $lines = explode("\n",$f);
 expect($lines[0])->toBe(Color::red("two things"));
 expect($lines[1])->toBe('  '.Color::red("fail 1 *"));
-expect($lines[3])->toBe('  '.Color::green("ok 2"));
+expect($lines[2])->toBe('  '.Color::green("ok 2"));
+
+# shows a detailed description after the spec
+#............................................
+$s = new Spec('two things');
+$s_1 = new Spec('fail 1 *');
+$s_1->set_code("expect(2)->toBe(1);");
+$s_2 = new Spec('ok 2');
+$s_2->set_code("expect(2)->toBe(2);");
+$s->add_sub_spec($s_1);
+$s->add_sub_spec($s_2);
+SpecRunner::run($s);
+$formatter = new SpecFormatter();
+$f = $formatter->format($s);
+$lines = explode("\n",$f);
+
+expect($lines[3])->toBe("");
+expect($lines[4])->toBe(Color::red("Failed Specs:"));
+expect($lines[5])->toBe("");
+expect($lines[6])->toBe(Color::red("fail 1 *"));
+expect($lines[7])->toBe(Color::red("---------------------------------------------------"));
+expect($lines[8])->toBe(Color::red("Expecting 2 to be 1"));
+expect($lines[9])->toBe('');
+
 
 ####################
 #  SpecParser

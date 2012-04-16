@@ -7,13 +7,43 @@ class Spec {
     private $result = null;
     private $message;
     private $error_line;
+    #private $parent_spec;
 
     function __construct($name) {
       $this->name = $name;
     }
 
+    function get_failed_leaves() {
+      $failed_leaves = array();
+
+      if($this->is_leaf()) {
+        if($this->result === false) {
+          $failed_leaves[] = $this;
+        }
+      }
+      else {
+        foreach($this->sub_specs as $s) {
+          $failed_leaves = array_merge($s->get_failed_leaves(), $failed_leaves);
+        }
+      }
+      return $failed_leaves;
+    }
+
+    function is_leaf() {
+      return (count($this->sub_specs) == 0);
+    }
+
     function add_sub_spec($sub_spec) {
+      #$sub_spec->set_parent_spec($this);
       $this->sub_specs[] = $sub_spec;
+    }
+
+    // function set_parent_spec(Spec $spec) {
+    //   $this->parent_spec = $spec;
+    // }
+
+    function is_root() {
+      return is_null($this->parent_spec);
     }
 
     function set_error_line($error_line) {

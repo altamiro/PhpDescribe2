@@ -41,6 +41,11 @@
       expect($s->get_message())->toBe('Syntax error on line 3 of the code.');
 
       ############################
+      # error
+      ############################
+      expect(1)->toBe(2);
+
+      ############################
       # code with blank lines
       ############################
       $s = new Spec('test');
@@ -102,7 +107,9 @@
     # no vars are set on each spec
     #######################################################
     $v = get_defined_vars();
-    expect(count($v))->toBe(0);
+    expect(count($v))->toBe(1);
+    $vars = array_keys($v);
+    expect($vars[0])->toBe('______code');
 
     #############################################################################
     # should recover from a fatal error running each test in a isolated proccess
